@@ -1,0 +1,61 @@
+<html>
+<head>
+<title>D3 test</title>
+<script src="http://d3js.org/d3.v2.js"></script>
+<script src="nv.d3.js"></script>
+<link rel="stylesheet" href="nv.d3.css">
+<style>
+
+#chart svg {
+  height: 400px;
+  width: 700px;
+}
+
+</style>
+</head>
+<body>
+<script>
+nv.addGraph(function() { 
+  var chart = nv.models.lineChart();
+
+  chart.xAxis
+    .axisLabel('Distance')
+    .tickFormat(d3.format(',r'));
+
+  chart.yAxis
+    .axisLabel('Pace')
+    .tickFormat(d3.format('.02f'));
+
+  d3.select('#chart svg')
+    .datum(datapoints()).transition().duration(500).call(chart);
+
+  nv.utils.windowResize(function() { d3.select('#chart svg').call(chart) });
+
+  return chart;
+});
+
+function datapoints() { 
+    return [ 
+        { 
+            values: [{x:0, y: 5}, {x: 0.5, y: 5.2}, {x: 0.7, y: 5.2},
+                     {x:1.3, y: 6}, {x: 1.7, y: 5}],
+            key: 'Pace',
+        },
+        { 
+            values: [{x:0, y: 8}, {x: 0.3, y: 7}, {x: 0.5, y: 8},
+                     {x: 1, y: 5}, {x: 1.3, y:7}, {x: 1.8, y: 5}],
+            key: 'Altitude',
+        },
+     ];
+}
+
+</script>
+
+
+<div id="chart">
+  <svg></svg>
+</div>
+
+
+</body>
+</html>
