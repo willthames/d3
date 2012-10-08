@@ -16,21 +16,26 @@
 <body>
 <script>
 nv.addGraph(function() { 
-  var chart = nv.models.lineChart();
+  var chart = nv.models.linePlusBarChart();
 
   chart.xAxis
     .axisLabel('Distance')
     .tickFormat(d3.format(',r'));
 
-  chart.yAxis
+  chart.y1Axis
     .axisLabel('Pace')
     .tickFormat(d3.format('.02f'));
+
+  chart.y2Axis
+    .axisLabel('Altitude')
+    .tickFormat(d3.format(',r'));
 
   d3.select('#chart svg')
     .datum(datapoints()).transition().duration(500).call(chart);
 
   nv.utils.windowResize(function() { d3.select('#chart svg').call(chart) });
 
+  chart.lines.forceY([0])
   return chart;
 });
 
@@ -40,10 +45,11 @@ function datapoints() {
             values: [{x:0, y: 5}, {x: 0.5, y: 5.2}, {x: 0.7, y: 5.2},
                      {x:1.3, y: 6}, {x: 1.7, y: 5}],
             key: 'Pace',
+            bar: true,
         },
         { 
-            values: [{x:0, y: 8}, {x: 0.3, y: 7}, {x: 0.5, y: 8},
-                     {x: 1, y: 5}, {x: 1.3, y:7}, {x: 1.8, y: 5}],
+            values: [{x:0, y: 80}, {x: 0.3, y: 77}, {x: 0.5, y: 83},
+                     {x: 1, y: 59}, {x: 1.3, y:72}, {x: 1.8, y: 58}],
             key: 'Altitude',
         },
      ];

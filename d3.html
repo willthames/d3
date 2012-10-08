@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>D3 test</title>
+<script src="http://d3js.org/d3.v2.js"></script>
+<link rel="stylesheet" href="nv.d3.css">
+</head>
+<body>
+<script>
+var data;
+
+function drawgraph() { 
+    
+}   
+
+svg = d3.select("#chart").append("svg");
+
+d3.json("http://localhost:4000/data.json", function(json) { 
+    data = json;
+    drawgraph();
+});
+
+</script>
+<div id="chart">
+</div>
+</body>
+</html>
