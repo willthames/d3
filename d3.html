@@ -1,26 +1,76 @@
-<html>
+<!DOCTYPE html>
+
 <head>
+<meta charset="UTF-8"/>
 <title>D3 test</title>
 <script src="http://d3js.org/d3.v2.js"></script>
-<link rel="stylesheet" href="nv.d3.css">
+<link rel="stylesheet" href="d3.css">
 </head>
 <body>
 <script>
 var data;
+var m=[80,80,80,80];
+var w=700 - m[1] - m[3];
+var h=500 - m[0] - m[2];
 
-function drawgraph() { 
-    
-}   
+var x = d3.scale.linear().range([0, w]),
+    y = d3.scale.linear().range([h,0]),
+    xAxis = d3.svg.axis().scale(x),
+    yAxis = d3.svg.axis().scale(y).orient("left");
 
-svg = d3.select("#chart").append("svg");
+// line generator
+var line = d3.svg.line()
+    .x(function(d) { return x(d.x); })
+    .y(function(d) { return y(d.y); })
 
-d3.json("http://localhost:4000/data.json", function(json) { 
+// An area generator, for the light fill.
+var area = d3.svg.area()
+    .x(function(d) { return x(d[1]); })
+    .y0(h)
+    .y1(0)
+
+d3.json("http://localhost:4001/data.json", function(json) { 
     data = json;
-    drawgraph();
+    data.records.forEach(function(d) { 
+        d.x = +d.x;
+        d.y = +d.y;
+    });
+    data.laps.forEach(function(d) { 
+        d = +d;
+    });
+
+    x.domain([0, data.records[data.records.length - 1].x]);
+    y.domain([0, d3.max(data.records, function(d) { return d.y; })]);
+
+  var svg = d3.select("body").append("svg:svg")
+      .attr("width", w + m[1] + m[3])
+      .attr("height", h + m[0] + m[2])
+    .append("svg:g")
+      .attr("transform", "translate(" + m[3] + "," + m[0] +")");
+
+  // Add the x-axis.
+  svg.append("svg:g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + h + ")")
+      .call(xAxis);
+
+  // Add the y-axis.
+  svg.append("svg:g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
+  // Add the line path.
+  svg.append("svg:path")
+      .attr("class", "line")
+      .attr("clip-path", "url(#clip)")
+      .attr("d", line(data.records));
+
+  // Add the laps
+  svg.append("svg:area")
+      .attr("class", "area")
+      .attr("d", area(data.laps))
 });
 
 </script>
-<div id="chart">
-</div>
 </body>
 </html>
