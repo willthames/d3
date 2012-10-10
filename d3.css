@@ -4,19 +4,20 @@ path.line {
   stroke-width: 1.5px;
 }
 
-path.area {
+.odd {
   fill: #e7e7e7;
 }
 
-.axis {
-  shape-rendering: crispEdges;
+.even {
+  fill: #d4d4d4;
 }
 
-.x.axis line, .x.axis path, .y.axis line, .y.axis path {
+.rect { 
+    fill: #eee;
+}
+
+.axis path, .axis line {
+  shape-rendering: crispEdges;
   fill: none;
   stroke: #000;
 }
-.axis {
-  shape-rendering: crispEdges;
-}
-

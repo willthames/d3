@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-
 <head>
 <meta charset="UTF-8"/>
 <title>D3 test</title>
 <script src="http://d3js.org/d3.v2.js"></script>
 <link rel="stylesheet" href="d3.css">
+
 </head>
 <body>
 <script>
@@ -23,30 +23,50 @@ var line = d3.svg.line()
     .x(function(d) { return x(d.x); })
     .y(function(d) { return y(d.y); })
 
-// An area generator, for the light fill.
-var area = d3.svg.area()
-    .x(function(d) { return x(d[1]); })
-    .y0(h)
-    .y1(0)
-
 d3.json("http://localhost:4001/data.json", function(json) { 
-    data = json;
-    data.records.forEach(function(d) { 
+    records = json.records;
+    
+    // parse numbers correctly
+    records.forEach(function(d) { 
         d.x = +d.x;
         d.y = +d.y;
     });
-    data.laps.forEach(function(d) { 
-        d = +d;
-    });
+    laps = [];
+    for (var i = 0, n = json.laps.length; i < n; i++) { 
+        var lap = {
+            x0: (i==0 ? 0 : +json.laps[i-1]),
+            x1: +json.laps[i],
+            index: i
+        };
+        laps.push(lap);
+    }
 
-    x.domain([0, data.records[data.records.length - 1].x]);
-    y.domain([0, d3.max(data.records, function(d) { return d.y; })]);
+    x.domain([0, records[records.length - 1].x]);
+    y.domain([0, d3.max(records, function(d) { return d.y; })]);
 
   var svg = d3.select("body").append("svg:svg")
       .attr("width", w + m[1] + m[3])
       .attr("height", h + m[0] + m[2])
     .append("svg:g")
       .attr("transform", "translate(" + m[3] + "," + m[0] +")");
+
+
+  // Add the laps
+  svg.selectAll(".lap")
+      .data(laps)
+    .enter().append("rect")
+      .attr("x", function(d) { return x(d.x0) })
+      .attr("width", function(d) { return x(d.x1 - d.x0) })
+      .attr("y", function(d) { return 0 })
+      .attr("height", function(d) { return h })
+      .attr("class", function(d) { return d.index%2==0 ? "even" : "odd" })
+      .attr("class", "area")
+
+  // Add the line path.
+  svg.append("svg:path")
+      .attr("class", "line")
+      .attr("clip-path", "url(#clip)")
+      .attr("d", line(records));
 
   // Add the x-axis.
   svg.append("svg:g")
@@ -58,17 +78,6 @@ d3.json("http://localhost:4001/data.json", function(json) {
   svg.append("svg:g")
       .attr("class", "y axis")
       .call(yAxis);
-
-  // Add the line path.
-  svg.append("svg:path")
-      .attr("class", "line")
-      .attr("clip-path", "url(#clip)")
-      .attr("d", line(data.records));
-
-  // Add the laps
-  svg.append("svg:area")
-      .attr("class", "area")
-      .attr("d", area(data.laps))
 });
 
 </script>
