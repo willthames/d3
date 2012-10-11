@@ -35,8 +35,7 @@ d3.json("http://localhost:4001/data.json", function(json) {
     for (var i = 0, n = json.laps.length; i < n; i++) { 
         var lap = {
             x0: (i==0 ? 0 : +json.laps[i-1]),
-            x1: +json.laps[i],
-            index: i
+            x1: +json.laps[i]
         };
         laps.push(lap);
     }
@@ -52,14 +51,14 @@ d3.json("http://localhost:4001/data.json", function(json) {
 
 
   // Add the laps
-  svg.selectAll(".lap")
+  svg.selectAll(".fish")
       .data(laps)
-    .enter().append("rect")
+    .enter().append("svg:rect")
       .attr("x", function(d) { return x(d.x0) })
       .attr("width", function(d) { return x(d.x1 - d.x0) })
       .attr("y", function(d) { return 0 })
       .attr("height", function(d) { return h })
-      .attr("class", function(d) { return d.index%2==0 ? "even" : "odd" })
+      .attr("class", function(d,i) { return i%2==0 ? "even" : "odd" })
       .attr("class", "area")
 
   // Add the line path.
