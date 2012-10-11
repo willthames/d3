@@ -59,7 +59,6 @@ d3.json("http://localhost:4001/data.json", function(json) {
       .attr("y", function(d) { return 0 })
       .attr("height", function(d) { return h })
       .attr("class", function(d,i) { return i%2==0 ? "even" : "odd" })
-      .attr("class", "area")
 
   // Add the line path.
   svg.append("svg:path")
