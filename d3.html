@@ -3,6 +3,7 @@
 <meta charset="UTF-8"/>
 <title>D3 test</title>
 <script src="http://d3js.org/d3.v2.js"></script>
+<script src="activity.js"></script>
 <link rel="stylesheet" href="d3.css">
 
 </head>
@@ -24,22 +25,8 @@ var line = d3.svg.line()
     .y(function(d) { return y(d.y); })
 
 d3.json("http://localhost:4001/20121012-1806.json", function(json) { 
-    records = json.records;
-    
-    // parse numbers correctly
-    records.forEach(function(d) { 
-        d.x = +d.d;
-        d.y = +d.v;
-    });
-    laps = [];
-    for (var i = 0, n = json.laps.length; i < n; i++) { 
-        x0 = (i==0 ? 0 : laps[i-1].x1)
-        var lap = {
-            x0: x0,
-            x1: +json.laps[i].d + x0
-        };
-        laps.push(lap);
-    }
+    records = json_to_records(json);
+    laps = json_to_laps(json);
 
     x.domain([0, records[records.length - 1].x]);
     y.domain([0, 1.1*d3.max(records, function(d) { return d.y; })]);
