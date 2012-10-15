@@ -1,35 +1,52 @@
+function time_to_string(seconds) {
+    var result = ""
+    if (seconds / 3600) { 
+        result = sprintf("%d:", seconds/3600); 
+        seconds = seconds % 3600;
+    }
+    result = result + sprintf("%02d:", seconds/60);
+    seconds = seconds % 60;
+    return result + sprintf("%02d", seconds);
+}
+
 var speed = {
     value: function(d) { return +d.v; },
     name: "Speed",
-    units: "km/h"
+    units: "km/h",
+    toString: function(d) { return d.v; }
 };
 
 var distance = { 
     value: function(d) { return (+d.d) / 1000; }, 
     name: "Distance",
-    units: "km"
+    units: "km",
+    toString: function(d) { return (+d.d) / 1000; }
 };
 
 var altitude = { 
     value: function(d) { return +d.a; },
     name: "Altitude",
-    units: "m"
+    units: "m",
+    toString: function(d) { return d.a; }
 };
 
 var time = { 
     value: function(d) { return +d.t; },
-    name: "Time"
+    name: "Time",
+    toString: function(d) { return time_to_string(+d.t); }
 };
     
 
-function json_to_laps(json, xValue) { 
+function json_to_laps(json, xObject) { 
     var laps = [];
+    var x0 = 0;
     for (var i = 0, n = json.laps.length; i < n; i++) { 
-        var x0 = (i==0 ? 0 : laps[i-1].x1)
         var lap = {
             x0: x0,
-            x1: +xValue(json.laps[i]) + x0
+            x1: xObject.value(json.laps[i])
         };
+        x0 = lap.x1; 
+        // alert (lap.x0 + " " + lap.x1);
         laps.push(lap);
     }
     return laps;
@@ -45,7 +62,7 @@ function drawGraph(json, xObject, yObject,
         yAxis = d3.svg.axis().scale(y).orient("left");
 
     records = json.records;
-    laps = json_to_laps(json, xObject.value);
+    laps = json_to_laps(json, xObject);
     
     x.domain([xObject.value(records[0]), 
               xObject.value(records[records.length - 1])]);
