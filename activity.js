@@ -1,14 +1,26 @@
+var speed = {
+    value: function(d) { return +d.v; },
+    name: "Speed",
+    units: "km/h"
+};
 
-function json_to_records(json) { 
-    var records = json.records;
+var distance = { 
+    value: function(d) { return (+d.d) / 1000; }, 
+    name: "Distance",
+    units: "km"
+};
+
+var altitude = { 
+    value: function(d) { return +d.a; },
+    name: "Altitude",
+    units: "m"
+};
+
+var time = { 
+    value: function(d) { return +d.t; },
+    name: "Time"
+};
     
-    // parse numbers correctly
-    records.forEach(function(d) { 
-        d.x = +d.d;
-        d.y = +d.v;
-    }); 
-    return records;
-}
 
 function json_to_laps(json, xValue) { 
     var laps = [];
@@ -23,7 +35,7 @@ function json_to_laps(json, xValue) {
     return laps;
 }
 
-function drawGraph(json, xValue, yValue, 
+function drawGraph(json, xObject, yObject,
                    width, height) { 
 
     var m = [0.1 * width, 0.1 * height, 0.1 * width, 0.1 * height];
@@ -32,11 +44,12 @@ function drawGraph(json, xValue, yValue,
         xAxis = d3.svg.axis().scale(x),
         yAxis = d3.svg.axis().scale(y).orient("left");
 
-    records = json_to_records(json);
-    laps = json_to_laps(json, xValue);
+    records = json.records;
+    laps = json_to_laps(json, xObject.value);
     
-    x.domain([0, xValue(records[records.length - 1])]);
-    y.domain([0, 1.1*d3.max(records, yValue)]);
+    x.domain([xObject.value(records[0]), 
+              xObject.value(records[records.length - 1])]);
+    y.domain([0, 1.1*d3.max(records, yObject.value)]);
 
     var svg = d3.select("body").append("svg:svg")
         .attr("width", width + m[1] + m[3])
@@ -56,8 +69,8 @@ function drawGraph(json, xValue, yValue,
 
     // line generator
     var line = d3.svg.line()
-      .x(function(d) { return x(xValue(d)); })
-      .y(function(d) { return y(yValue(d)); })
+      .x(function(d) { return x(xObject.value(d)); })
+      .y(function(d) { return y(yObject.value(d)); })
 
 
     // Add the line path.

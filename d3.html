@@ -11,11 +11,9 @@
 <script>
 
 d3.json("http://localhost:4001/20121012-1806.json", function(json) { 
-    drawGraph(json, function(d) { return d.d }, 
-              function(d) { return d.v }, 700, 500);
+    drawGraph(json, distance, speed, 700, 500);
 
-    drawGraph(json, function(d) { return d.d }, 
-              function(d) { return d.a }, 800, 400);
+    drawGraph(json, time, altitude, 800, 400);
 
 });
 
