@@ -1,12 +1,15 @@
 function time_to_string(seconds) {
     var result = ""
-    if (seconds / 3600) { 
-        result = sprintf("%d:", seconds/3600); 
+
+    zeropad = d3.format("02d");
+    seconds = Math.round(seconds);
+    if (Math.floor(seconds / 3600)) { 
+        result = zeropad(seconds/3600) + ":"; 
         seconds = seconds % 3600;
     }
-    result = result + sprintf("%02d:", seconds/60);
+    result = result + zeropad(Math.floor(seconds/60)) + ":";
     seconds = seconds % 60;
-    return result + sprintf("%02d", seconds);
+    return result + zeropad(seconds);
 }
 
 var speed = {
@@ -106,4 +109,43 @@ function drawGraph(json, xObject, yObject,
     svg.append("svg:g")
         .attr("class", "y axis")
         .call(yAxis);
+}
+
+function summaryData(json) { 
+
+}
+
+function lapData(json) { 
+    var laps = json.laps;
+    var columns = [ "Lap", "Duration", "Distance", "Speed" ];
+
+    var lapTable = d3.select("#lapTable"),
+        thead = lapTable.append("thead"), 
+        tbody = lapTable.append("tbody");
+
+    thead.append("tr")
+        .selectAll("th")
+        .data(columns)
+        .enter()
+        .append("th")
+            .text(function(column) { return column; });
+
+    var rows = tbody.selectAll("tr")
+        .data(laps)
+        .enter()
+        .append("tr");
+
+    var two_dp = d3.format(".2f");
+
+    var cells = rows.selectAll("td")
+        .data(function(row, index) { 
+            return [ index+1, time_to_string(time.value(row)), 
+                     two_dp(distance.value(row)),
+                     two_dp(3600 * distance.value(row) / time.value(row)) ];
+        })
+        .enter()
+        .append("td")
+            .text(function(d) { return d; });
+                     
+
 }
