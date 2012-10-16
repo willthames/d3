@@ -1,7 +1,14 @@
 path.line {
   fill: none;
-  stroke: #600;
   stroke-width: 1.5px;
+}
+
+path.line.speed { 
+    stroke: #006;
+}
+
+path.line.altitude { 
+    stroke: #600;
 }
 
 rect.odd {

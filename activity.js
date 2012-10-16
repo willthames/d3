@@ -103,7 +103,7 @@ function drawGraph(json, xObject, yObject,
 
     // Add the line path.
     svg.append("svg:path")
-        .attr("class", "line")
+        .attr("class", "line " + yObject.name)
         .attr("clip-path", "url(#clip)")
         .attr("d", line(records));
 
