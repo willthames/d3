@@ -14,41 +14,48 @@ function time_to_string(seconds) {
 
 var speed = {
     value: function(d) { return +d.v; },
-    name: "Speed",
+    name: "speed",
     units: "km/h",
     toString: function(d) { return d.v; }
 };
 
 var distance = { 
     value: function(d) { return (+d.d) / 1000; }, 
-    name: "Distance",
+    name: "distance",
     units: "km",
     toString: function(d) { return (+d.d) / 1000; }
 };
 
 var altitude = { 
     value: function(d) { return +d.a; },
-    name: "Altitude",
+    name: "altitude",
     units: "m",
     toString: function(d) { return d.a; }
 };
 
 var time = { 
     value: function(d) { return +d.t; },
-    name: "Time",
+    name: "time",
     toString: function(d) { return time_to_string(+d.t); }
 };
     
 
 function json_to_laps(json, xObject) { 
     var laps = [];
-    var x0 = 0;
+    var time_x0 = 0, distance_x0 = 0;
     for (var i = 0, n = json.laps.length; i < n; i++) { 
         var lap = {
-            x0: x0,
-            x1: xObject.value(json.laps[i])
+            time: { 
+                x0: time_x0,
+                width: time.value(json.laps[i]) - time_x0
+            },
+            distance: { 
+                x0: distance_x0,
+                width: distance.value(json.laps[i]) - distance_x0
+            }
         };
-        x0 = lap.x1; 
+        time_x0 = time_x0 + lap.time.width; 
+        distance_x0 = distance_x0 + lap.distance.width; 
         // alert (lap.x0 + " " + lap.x1);
         laps.push(lap);
     }
@@ -78,11 +85,12 @@ function drawGraph(json, xObject, yObject,
         .attr("transform", "translate(" + m[3] + "," + m[0] +")");
 
     // Add the laps
+    var xName = xObject.name
     svg.selectAll(".fish")
         .data(laps)
       .enter().append("svg:rect")
-        .attr("x", function(d) { return x(d.x0) })
-        .attr("width", function(d) { return x(d.x1 - d.x0) })
+        .attr("x", function(d) { return x(d[xObject.name].x0) })
+        .attr("width", function(d) { return x(d[xName].width) })
         .attr("y", function(d) { return 0 })
         .attr("height", function(d) { return height })
         .attr("class", function(d,i) { return i%2==0 ? "even" : "odd" })
@@ -116,7 +124,7 @@ function summaryData(json) {
 }
 
 function lapData(json) { 
-    var laps = json.laps;
+    var laps = json_to_laps(json);
     var columns = [ "Lap", "Duration", "Distance", "Speed" ];
 
     var lapTable = d3.select("#lapTable"),
@@ -133,15 +141,17 @@ function lapData(json) {
     var rows = tbody.selectAll("tr")
         .data(laps)
         .enter()
-        .append("tr");
+        .append("tr")
+        .attr("class", 
+              function(d, i) { return "lap " + (i%2 == 0 ? "even" : "odd") });
 
     var two_dp = d3.format(".2f");
 
     var cells = rows.selectAll("td")
         .data(function(row, index) { 
-            return [ index+1, time_to_string(time.value(row)), 
-                     two_dp(distance.value(row)),
-                     two_dp(3600 * distance.value(row) / time.value(row)) ];
+            return [ index+1, time_to_string(row.time.width), 
+                     two_dp(row.distance.width),
+                     two_dp(3600 * row.distance.width / row.time.width) ]
         })
         .enter()
         .append("td")

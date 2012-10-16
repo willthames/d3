@@ -4,12 +4,24 @@ path.line {
   stroke-width: 1.5px;
 }
 
-.odd {
+rect.odd {
   fill: #e7e7e7;
 }
 
-.even {
+rect.even {
   fill: #d4d4d4;
+}
+
+#lapTable { 
+  border: none;
+}
+
+tr.odd { 
+  background-color: lightyellow;
+}
+
+tr.even {
+  background-color: lightblue;
 }
 
 .rect { 
