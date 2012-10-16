@@ -1,14 +1,22 @@
 path.line {
   fill: none;
-  stroke-width: 1.5px;
+  stroke-width: 3px;
 }
 
 path.line.speed { 
     stroke: #006;
 }
 
+path.area.speed { 
+    fill: #88f;
+}
+
 path.line.altitude { 
     stroke: #600;
+}
+
+path.area.altitude { 
+    fill: #f88;
 }
 
 rect.odd {

@@ -78,7 +78,7 @@ function drawGraph(json, xObject, yObject,
               xObject.value(records[records.length - 1])]);
     y.domain([0, 1.1*d3.max(records, yObject.value)]);
 
-    var svg = d3.select("body").append("svg:svg")
+    var svg = d3.select("body").append("div").append("svg:svg")
         .attr("width", width + m[1] + m[3])
         .attr("height", height + m[0] + m[2])
       .append("svg:g")
@@ -100,6 +100,16 @@ function drawGraph(json, xObject, yObject,
       .x(function(d) { return x(xObject.value(d)); })
       .y(function(d) { return y(yObject.value(d)); })
 
+    // An area generator, for the light fill.
+    var area = d3.svg.area()
+        .x(function(d) { return x(xObject.value(d)); })
+        .y0(height)
+        .y1(function(d) { return y(yObject.value(d)); })
+
+    // Add the area below the line
+    svg.append("svg:path")
+        .attr("class", "area " + yObject.name)
+        .attr("d", area(records));
 
     // Add the line path.
     svg.append("svg:path")
