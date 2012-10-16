@@ -1,3 +1,5 @@
+var two_dp = d3.format(".2f");
+
 function time_to_string(seconds) {
     var result = ""
 
@@ -39,7 +41,9 @@ var time = {
     toString: function(d) { return time_to_string(+d.t); }
 };
     
-
+// json_to_laps converts raw lap data into something more useful
+// for drawing laps and more particularly lap summary data 
+// where we typically don't want the cumulative data
 function json_to_laps(json, xObject) { 
     var laps = [];
     var time_x0 = 0, distance_x0 = 0;
@@ -129,8 +133,16 @@ function drawGraph(json, xObject, yObject,
         .call(yAxis);
 }
 
+
 function summaryData(json) { 
 
+    var summary = d3.select("body").append("table").attr("id", "summaryTable"),
+        tbody = summary.append("tbody");
+
+    row = tbody.append("tr")
+    row.append("th").text("Distance")
+    row.append("td").text(two_dp(distance.value(json.summary)) + 
+                          " " + distance.units)
 }
 
 function lapData(json) { 
@@ -155,7 +167,6 @@ function lapData(json) {
         .attr("class", 
               function(d, i) { return "lap " + (i%2 == 0 ? "even" : "odd") });
 
-    var two_dp = d3.format(".2f");
 
     var cells = rows.selectAll("td")
         .data(function(row, index) { 
@@ -167,5 +178,4 @@ function lapData(json) {
         .append("td")
             .text(function(d) { return d; });
                      
-
 }
