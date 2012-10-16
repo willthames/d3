@@ -127,7 +127,7 @@ function lapData(json) {
     var laps = json_to_laps(json);
     var columns = [ "Lap", "Duration", "Distance", "Speed" ];
 
-    var lapTable = d3.select("#lapTable"),
+    var lapTable = d3.select("body").append("table").attr("id", "lapTable"),
         thead = lapTable.append("thead"), 
         tbody = lapTable.append("tbody");
 
