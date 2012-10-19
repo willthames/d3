@@ -69,7 +69,8 @@ function json_to_laps(json, xObject) {
 function drawGraph(json, xObject, yObject,
                    width, height) { 
 
-    var m = [0.1 * width, 0.1 * height, 0.1 * width, 0.1 * height];
+    // margins start at top and go clockwise
+    var m = [0.1 * height, 0.1 * width, 0.15 * height, 0.15 * width];
     var x = d3.scale.linear().range([0, width]),
         y = d3.scale.linear().range([height,0]),
         xAxis = d3.svg.axis().scale(x),
@@ -97,7 +98,7 @@ function drawGraph(json, xObject, yObject,
         .attr("width", function(d) { return x(d[xName].width) })
         .attr("y", function(d) { return 0 })
         .attr("height", function(d) { return height })
-        .attr("class", function(d,i) { return i%2==0 ? "even" : "odd" })
+        .attr("class", function(d,i) { return (i+1)%2==0 ? "even" : "odd" })
 
     // line generator
     var line = d3.svg.line()
@@ -131,6 +132,23 @@ function drawGraph(json, xObject, yObject,
     svg.append("svg:g")
         .attr("class", "y axis")
         .call(yAxis);
+
+    // Add some axes labels.
+    svg.append("text")
+        .attr("class", "x label")
+        .attr("text-anchor", "center")
+        .attr("x", width/2)
+        .attr("y", height)
+        .attr("dy", "24pt")
+        .text(xObject.name + (xObject.units ? " (" + xObject.units + ")" : ""));
+
+    svg.append("text")
+        .attr("class", "y label")
+        .attr("text-anchor", "end")
+        .attr("x", height)
+        .attr("y", 0)
+        .attr("transform", "translate(-30," + height + " ) rotate(-90)")
+        .text(yObject.name + (yObject.units ? " (" + yObject.units + ")" : ""));
 }
 
 
@@ -165,7 +183,7 @@ function lapData(json) {
         .enter()
         .append("tr")
         .attr("class", 
-              function(d, i) { return "lap " + (i%2 == 0 ? "even" : "odd") });
+              function(d, i) { return "lap " + ((i+1)%2 == 0 ? "even" : "odd") });
 
 
     var cells = rows.selectAll("td")
