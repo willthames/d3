@@ -3,6 +3,7 @@
 <meta charset="UTF-8"/>
 <title>D3 test</title>
 <script src="http://d3js.org/d3.v2.js"></script>
+<script src="moment.min.js"></script>
 <script src="activity.js"></script>
 <link rel="stylesheet" href="d3.css">
 
@@ -11,6 +12,7 @@
 <script>
 
 d3.json("http://localhost:4001/20121012-1806.json", function(json) { 
+    title(json);
     drawGraph(json, distance, speed, 400, 300);
 
     drawGraph(json, time, altitude, 400, 300);

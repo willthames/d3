@@ -6,7 +6,7 @@ function time_to_string(seconds) {
     zeropad = d3.format("02d");
     seconds = Math.round(seconds);
     if (Math.floor(seconds / 3600)) { 
-        result = zeropad(seconds/3600) + ":"; 
+        result = zeropad(Math.floor(seconds/3600)) + ":"; 
         seconds = seconds % 3600;
     }
     result = result + zeropad(Math.floor(seconds/60)) + ":";
@@ -157,10 +157,23 @@ function summaryData(json) {
     var summary = d3.select("body").append("table").attr("id", "summaryTable"),
         tbody = summary.append("tbody");
 
-    row = tbody.append("tr")
-    row.append("th").text("Distance")
-    row.append("td").text(two_dp(distance.value(json.summary)) + 
-                          " " + distance.units)
+    summary_values = { 
+        "Start time" : moment(1000 * json.summary.t_start).format("DD/MM/YYYY HH:mm"),
+        "Duration" : time_to_string(json.summary.t - json.summary.t_start),
+        "Distance" : two_dp(distance.value(json.summary)) +
+                                  " " + distance.units,
+        "Total Ascent" : json.summary.asc + " m",
+        "Total Descent" : json.summary.desc + " m",
+        "Max speed" : two_dp(json.summary.v_max) + " m/s",
+        "Average speed": two_dp(json.summary.v_avg) + " m/s",
+        "Calories": json.summary.cals
+    };
+
+    for (var key in summary_values) { 
+        row = tbody.append("tr");
+        row.append("th").text(key);
+        row.append("td").text(summary_values[key])
+    }
 }
 
 function lapData(json) { 
@@ -196,4 +209,13 @@ function lapData(json) {
         .append("td")
             .text(function(d) { return d; });
                      
+}
+
+function title(json) { 
+    var titleh1 = d3.select("body").append("h1")
+
+    titleStr = moment(1000 * json.summary.t_start).format("DD/MM/YYYY");
+    titleStr += " " + two_dp(distance.value(json.summary)) + " km";
+    titleStr += " " + time_to_string(json.summary.t - json.summary.t_start);    
+    titleh1.text(titleStr);
 }
