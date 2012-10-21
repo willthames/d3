@@ -154,7 +154,9 @@ function drawGraph(json, xObject, yObject,
 
 function summaryData(json) { 
 
-    var summary = d3.select("body").append("table").attr("id", "summaryTable"),
+    var summary = d3.select("body").append("table")
+                      .attr("id", "summaryTable")
+                      .attr("class", "table table-bordered"),
         tbody = summary.append("tbody");
 
     summary_values = { 
@@ -180,7 +182,9 @@ function lapData(json) {
     var laps = json_to_laps(json);
     var columns = [ "Lap", "Duration", "Distance", "Speed" ];
 
-    var lapTable = d3.select("body").append("table").attr("id", "lapTable"),
+    var lapTable = d3.select("body").append("table")
+                       .attr("id", "lapTable")
+                       .attr("class", "table table-bordered table-striped"),
         thead = lapTable.append("thead"), 
         tbody = lapTable.append("tbody");
 

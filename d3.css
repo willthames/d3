@@ -52,3 +52,7 @@ tr.even {
 #summaryTable th { 
   text-align: left;
 }
+
+#summaryTable, #lapTable { 
+  width: 400px;
+}
