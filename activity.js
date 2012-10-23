@@ -223,3 +223,37 @@ function title(json) {
     titleStr += " " + time_to_string(json.summary.t - json.summary.t_start);    
     titleh1.text(titleStr);
 }
+
+function getLongLat(lon, lat) { 
+    return new OpenLayers.LonLat( lon, lat)
+        .transform(
+            new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
+            map.getProjectionObject() // to Spherical Mercator Projection
+        );
+}
+
+function drawMap(json) { 
+    var MM=com.modestmaps;
+    d3.select("body").append("div")
+        .attr("id", "mapdiv");
+    var parent = "mapdiv";
+    var subdomains = [ '', 'a.', 'b.', 'c.' ];
+    var osm = new MM.TemplatedMapProvider('http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', subdomains);
+    var layer = new MM.Layer(osm);
+    var dimensions = new MM.Point(600,400);
+
+    var map = new MM.Map(parent, layer, dimensions);
+
+    var locations = [ new MM.Location(+json.summary.nec_lat, 
+                                      +json.summary.nec_lng),
+                      new MM.Location(+json.summary.swc_lat,
+                                      +json.summary.swc_lng) ]; 
+    map.setExtent(locations);
+ 
+//    var markers = new OpenLayers.Layer.Markers("Markers");
+//    map.addLayer(markers);
+
+//    markers.addMarker(new OpenLayers.Marker(center));
+
+    // create points based on records
+}
