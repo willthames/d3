@@ -233,27 +233,60 @@ function getLongLat(lon, lat) {
 }
 
 function drawMap(json) { 
-    var MM=com.modestmaps;
-    d3.select("body").append("div")
-        .attr("id", "mapdiv");
-    var parent = "mapdiv";
-    var subdomains = [ '', 'a.', 'b.', 'c.' ];
-    var osm = new MM.TemplatedMapProvider('http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', subdomains);
-    var layer = new MM.Layer(osm);
-    var dimensions = new MM.Point(600,400);
 
-    var map = new MM.Map(parent, layer, dimensions);
+    function project(x) {
+        var point = map.latLngToLayerPoint(new L.LatLng(x[1], x[0]));
+        return [point.x, point.y];
+    }
 
-    var locations = [ new MM.Location(+json.summary.nec_lat, 
-                                      +json.summary.nec_lng),
-                      new MM.Location(+json.summary.swc_lat,
-                                      +json.summary.swc_lng) ]; 
-    map.setExtent(locations);
+    var points = [];
+    for (var i = 0, n = json.records.length; i < n; i++) { 
+        var point = [ json.records[i].lng, json.records[i].lat ];
+        points.push(point);
+    }
+    var geojson = { 
+        type: "LineString",
+        coordinates: points,
+        bbox: [ [ +json.summary.swc_lng, +json.summary.swc_lat ],
+                [ +json.summary.nec_lng, +json.summary.nec_lat ] ]
+    };
  
-//    var markers = new OpenLayers.Layer.Markers("Markers");
-//    map.addLayer(markers);
+    var bounds = d3.geo.bounds(geojson),
+        path = d3.geo.path().projection(project);
+          
+    d3.select("body").append("div")
+        .attr("id", "map");
 
-//    markers.addMarker(new OpenLayers.Marker(center));
+    var centerX = (+json.summary.nec_lng + +json.summary.swc_lng)/2.0;
+    var centerY = (+json.summary.nec_lat + +json.summary.swc_lat)/2.0;
 
-    // create points based on records
+    var map = new L.Map("map")
+        .setView(new L.LatLng(centerY, centerX), 14)
+        .addLayer(new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'));
+
+    var svg = d3.select(map.getPanes().overlayPane).append("svg"),
+        g = svg.append("g");
+
+    var feature = g.selectAll("path")
+        .data(geojson)
+      .enter().append("path")
+        .attr("d", path);
+
+    map.on("viewreset", reset);
+    reset();
+
+    // Reposition the SVG to cover the features.
+    function reset() {
+        var bottomLeft = project(bounds[0]),
+            topRight = project(bounds[1]);
+
+        svg .attr("width", topRight[0] - bottomLeft[0])
+            .attr("height", bottomLeft[1] - topRight[1])
+            .style("margin-left", bottomLeft[0] + "px")
+            .style("margin-top", topRight[1] + "px");
+
+        g.attr("transform", "translate(" + -bottomLeft[0] + "," + -topRight[1] + ")");
+        feature.attr("d", path);
+    }
+
 }
